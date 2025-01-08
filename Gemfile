@@ -11,3 +11,5 @@ gem 'mysql2', '~> 0.5.4'
 gem 'nokogiri'
 gem 'word_wrap'
 gem 'erubis'
+
+gem "bigdecimal", "~> 3.1"

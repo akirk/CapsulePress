@@ -10,6 +10,7 @@ GEM
       timers (~> 4.1)
     async-io (1.35.0)
       async
+    bigdecimal (3.1.9)
     console (1.23.2)
       fiber-annotation
       fiber-local
@@ -45,7 +46,7 @@ GEM
       ruby2_keywords (~> 0.0.1)
     mysql2 (0.5.5)
     nio4r (2.5.9)
-    nokogiri (1.15.4-x86_64-linux)
+    nokogiri (1.18.1-x86_64-linux-gnu)
       racc (~> 1.4)
     public_suffix (5.0.3)
     racc (1.7.1)
@@ -58,6 +59,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  bigdecimal (~> 3.1)
   dotenv (~> 2.8)
   erubis
   gemini_server (~> 0.2.0)
@@ -69,4 +71,4 @@ DEPENDENCIES
   word_wrap
 
 BUNDLED WITH
-   2.2.3
+   2.6.2
