@@ -15,7 +15,7 @@ class Convert
     # handle galleries by converting to a list of image links
     html.gsub!(/\[gallery [^\]]*ids="([\d,]+)"\]/) do
       ids = $1.split(',').map(&:to_i)
-      urls = WP.query("SELECT DISTINCT ID, post_excerpt, guid FROM wp_posts WHERE ID IN (#{ids.join(',')})", cache_duration: 3600)
+      urls = WP.query("SELECT DISTINCT ID, post_excerpt, guid FROM #{WP.prefix}posts WHERE ID IN (#{ids.join(',')})", cache_duration: 3600)
       links = urls.map do |u| 
         t = u['post_excerpt']
         t = "Image ##{u['ID']}" if !t || (t == '')

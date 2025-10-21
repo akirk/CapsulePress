@@ -17,6 +17,10 @@ class WP
     )
   end
 
+  def self.prefix
+    ENV['DB_PREFIX'] || 'wp_'
+  end
+
   # Executes a given MySQL query against the WP database and returns the results.
   # If cache_duration: set to a positive value, caches results for that many seconds.
   def self.query(sql, cache_duration: 0)
@@ -36,35 +40,35 @@ class WP
   def self.preview(id)
     query("
       SELECT
-        wp_posts.ID, wp_posts.post_date_gmt, wp_posts.post_name, wp_posts.post_title, wp_posts.post_content, wp_postmeta_gemtext.meta_value gemtext
-      FROM wp_posts
-      LEFT JOIN wp_postmeta wp_postmeta_gemtext ON wp_posts.ID = wp_postmeta_gemtext.post_ID	AND wp_postmeta_gemtext.meta_key='gemtext'
-      WHERE wp_posts.ID=#{id.to_i}
+        #{prefix}posts.ID, #{prefix}posts.post_date_gmt, #{prefix}posts.post_name, #{prefix}posts.post_title, #{prefix}posts.post_content, #{prefix}postmeta_gemtext.meta_value gemtext
+      FROM #{prefix}posts
+      LEFT JOIN #{prefix}postmeta #{prefix}postmeta_gemtext ON #{prefix}posts.ID = #{prefix}postmeta_gemtext.post_ID	AND #{prefix}postmeta_gemtext.meta_key='gemtext'
+      WHERE #{prefix}posts.ID=#{id.to_i}
       LIMIT 1
     ").to_a[0]
   end
 
   def self.posts(
-    columns: ['wp_posts.ID', 'wp_posts.post_date_gmt', 'wp_posts.post_name', 'wp_posts.post_title', 'wp_posts.post_content', 'wp_postmeta_gemtext.meta_value gemtext'],
+    columns: ["#{prefix}posts.ID", "#{prefix}posts.post_date_gmt", "#{prefix}posts.post_name", "#{prefix}posts.post_title", "#{prefix}posts.post_content", "#{prefix}postmeta_gemtext.meta_value gemtext"],
     where: ['(1=1)'],
-    order_by: 'wp_posts.post_date_gmt DESC',
+    order_by: "#{prefix}posts.post_date_gmt DESC",
     limit: 30,
     with_tag: 'published-on-gemini',
     cache_duration: 300
   )
-    where << "wp_terms.slug='#{with_tag}'" if with_tag
+    where << "#{prefix}terms.slug='#{with_tag}'" if with_tag
     where_clauses = where.join(" AND\n ")
     query("
       SELECT
         #{columns.join(', ')}
-      FROM wp_terms
-      LEFT JOIN wp_term_taxonomy ON wp_terms.term_id = wp_term_taxonomy.term_id
-      LEFT JOIN wp_term_relationships ON wp_term_taxonomy.term_taxonomy_id = wp_term_relationships.term_taxonomy_id
-      LEFT JOIN wp_posts ON wp_term_relationships.object_id = wp_posts.ID
-      LEFT JOIN wp_postmeta wp_postmeta_gemtext ON wp_posts.ID = wp_postmeta_gemtext.post_ID AND wp_postmeta_gemtext.meta_key='gemtext'
-      WHERE wp_term_taxonomy.taxonomy='post_tag'
-      AND wp_posts.post_type = 'post'
-      AND wp_posts.post_status = 'publish'
+      FROM #{prefix}terms
+      LEFT JOIN #{prefix}term_taxonomy ON #{prefix}terms.term_id = #{prefix}term_taxonomy.term_id
+      LEFT JOIN #{prefix}term_relationships ON #{prefix}term_taxonomy.term_taxonomy_id = #{prefix}term_relationships.term_taxonomy_id
+      LEFT JOIN #{prefix}posts ON #{prefix}term_relationships.object_id = #{prefix}posts.ID
+      LEFT JOIN #{prefix}postmeta #{prefix}postmeta_gemtext ON #{prefix}posts.ID = #{prefix}postmeta_gemtext.post_ID AND #{prefix}postmeta_gemtext.meta_key='gemtext'
+      WHERE #{prefix}term_taxonomy.taxonomy='post_tag'
+      AND #{prefix}posts.post_type = 'post'
+      AND #{prefix}posts.post_status = 'publish'
       AND #{where_clauses}
       ORDER BY #{order_by}
       LIMIT #{limit}

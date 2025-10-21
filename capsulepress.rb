@@ -19,7 +19,7 @@ class CapsulePress
   PREVIEW_PREFIX = "/_preview_/#{ENV['PREVIEW_SECRET']}/"
 
   def self.known_slugs
-    WP.posts(columns: ['wp_posts.post_name'], limit: 99999) .to_a.map{|p|p['post_name']}
+    WP.posts(columns: ["#{WP.prefix}posts.post_name"], limit: 99999) .to_a.map{|p|p['post_name']}
   end
 
   def self.candidate_pages(root, path, protocol)
@@ -44,7 +44,7 @@ class CapsulePress
 
   def self.post(slug, protocol)
     safe_slug = slug.gsub(/[^a-z0-9\-]/i, '')
-    return false unless requested_post = WP.posts(where: [sprintf("wp_posts.post_name = '%s'", safe_slug)], limit: 1)[0]
+    return false unless requested_post = WP.posts(where: [sprintf("#{WP.prefix}posts.post_name = '%s'", safe_slug)], limit: 1)[0]
     puts "Found post ##{requested_post['ID']}"
     return false unless template = candidate_pages(TEMPLATES_DIR, 'post', protocol).first
     puts "Using template #{template}"

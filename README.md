@@ -48,6 +48,7 @@ DB_HOST=localhost
 DB_USER=username
 DB_PASS=password
 DB_NAME=database
+DB_PREFIX=wp_
 
 # Domain name of your WordPress instance (used for reverse-engineering internal link URLs):
 DOMAIN=example.com
